@@ -1,0 +1,47 @@
+
+AudioLDM2 Mel频谱预处理参数测试报告
+================================
+
+测试时间: 2025-07-18 10:40:28
+输入音频: AudioLDM2_Music_output.wav
+音频长度: 3.00秒
+
+测试结果:
+
+Current:
+  SNR: -7.19 dB
+  MSE: 0.111285
+  相关性: 0.0088
+  输出: mel_preprocessing_test\Current_snr-7.2_1752802828.wav
+
+Standard_16k:
+  SNR: -12.15 dB
+  MSE: 0.348431
+  相关性: -0.0001
+  输出: mel_preprocessing_test\Standard_16k_snr-12.1_1752802828.wav
+
+TacoCentric:
+  SNR: -8.25 dB
+  MSE: 0.141962
+  相关性: 0.0226
+  输出: mel_preprocessing_test\TacoCentric_snr-8.3_1752802828.wav
+
+AudioLDM_Style:
+  SNR: -14.75 dB
+  MSE: 0.633623
+  相关性: 0.0023
+  输出: mel_preprocessing_test\AudioLDM_Style_snr-14.7_1752802828.wav
+
+No_Normalization:
+  SNR: -0.00 dB
+  MSE: 0.021250
+  相关性: -0.0187
+  输出: mel_preprocessing_test\No_Normalization_snr-0.0_1752802828.wav
+
+最佳配置: No_Normalization
+最佳SNR: -0.00 dB
+
+结论:
+- 找到了相对较好的预处理参数
+- 建议进一步研究AudioLDM2的训练代码和论文
+- 考虑使用AudioLDM2的内置预处理方法

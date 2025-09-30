@@ -1,0 +1,42 @@
+{
+  "input_file": "AudioLDM2_Music_output.wav",
+  "output_dir": "vae_reconstruction_1752673579",
+  "original_path": "vae_reconstruction_1752673579\\AudioLDM2_Music_output_original.wav",
+  "audio_duration": 5.0,
+  "mel_generation_time": 0.010578155517578125,
+  "vae_processing_time": 0.18271708488464355,
+  "results": [
+    {
+      "method": "Griffin-Lim",
+      "path": "vae_reconstruction_1752673579\\AudioLDM2_Music_output_griffinlim_reconstruction.wav",
+      "time": 0.9503986835479736,
+      "status": "success",
+      "snr": -0.006067135130889755,
+      "correlation": -0.006337103311082506,
+      "rmse": 0.14666980504989624,
+      "signal_power": 0.02148199826478958,
+      "noise_power": 0.021512029692530632
+    },
+    {
+      "method": "AudioLDM2 Vocoder",
+      "path": "vae_reconstruction_1752673579\\AudioLDM2_Music_output_vocoder_reconstruction.wav",
+      "time": 0.051587581634521484,
+      "status": "success",
+      "snr": -8.336092697882279,
+      "correlation": 0.021109224169406974,
+      "rmse": 0.3825598955154419,
+      "signal_power": 0.02146790362894535,
+      "noise_power": 0.14635208249092102
+    }
+  ],
+  "model_info": {
+    "model_id": "cvssp/audioldm2-music",
+    "device": "cuda",
+    "vae_type": "AutoencoderKL",
+    "vocoder_type": "SpeechT5HifiGan"
+  },
+  "best_method": "Griffin-Lim",
+  "best_snr": -0.006067135130889755,
+  "method_difference": 8.33002556275139,
+  "vocoder_breakthrough": true
+}

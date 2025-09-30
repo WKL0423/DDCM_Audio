@@ -1,0 +1,31 @@
+Improved Visualization Test Summary
+========================================
+
+Test Case: high_quality
+  Overall Score: 0.992
+  Quality Level: 优秀 (Excellent)
+  SNR: 26.87 dB
+  Correlation: 0.999
+  STFT Score: 0.969
+------------------------------
+Test Case: medium_quality
+  Overall Score: 0.282
+  Quality Level: 较差 (Bad)
+  SNR: -2.59 dB
+  Correlation: 0.080
+  STFT Score: 0.629
+------------------------------
+Test Case: low_quality
+  Overall Score: 0.815
+  Quality Level: 良好 (Good)
+  SNR: 6.86 dB
+  Correlation: 0.899
+  STFT Score: 0.715
+------------------------------
+Test Case: phase_inverted
+  Overall Score: 0.468
+  Quality Level: 较差 (Bad)
+  SNR: -5.38 dB
+  Correlation: -0.869
+  STFT Score: 0.702
+------------------------------

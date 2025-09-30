@@ -1,0 +1,30 @@
+
+AudioLDM2 VAE+HiFiGAN 关键修复报告
+================================
+
+输入文件: AudioLDM2_Music_output.wav
+处理时间: 2025-07-18 10:33:59
+Vocoder方法: Griffin_Lim_Fixed
+
+音频信息:
+- 原始长度: 5.00秒
+- 重建长度: 5.00秒
+- 采样率: 16000 Hz
+
+质量指标:
+- MSE: 0.022020
+- 相关性: -0.0330
+- SNR: -0.11 dB
+
+技术细节:
+- Mel频谱: (64, 501)
+- VAE输入: torch.Size([1, 1, 64, 501])
+- VAE输出: torch.Size([1, 1, 64, 500])
+- Vocoder输入: torch.Size([1, 500, 64])
+
+修复要点:
+1. 正确的mel频谱参数和归一化
+2. 正确的VAE scaling factor应用
+3. 正确的HiFiGAN输入维度：[batch, n_mels, time]
+4. 尺寸对齐和数据类型匹配
+5. Griffin-Lim备选方案的尺寸修复

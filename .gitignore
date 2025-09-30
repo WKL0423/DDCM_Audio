@@ -1,0 +1,64 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+
+# VS Code & IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Envs
+.env
+.venv/
+venv/
+
+# Logs & coverage
+*.log
+.coverage
+htmlcov/
+pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data & Outputs
+/data/
+/datasets/
+/outputs/
+/tmp/
+
+# Generated analysis & artifacts
+step_1_training_matched_vae_reconstruction_fixed/
+# Keep plots if desired; comment out next line if you want to track images
+# *.png
+
+# Audio (large)
+*.wav
+*.flac
+*.mp3
+*.m4a
+
+# Model files / weights
+*.pt
+*.ckpt
+*.safetensors
+
+# Hugging Face caches (project-local)
+/hf_cache/
+/cache/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+
+# Misc
+*.bak
+*.tmp

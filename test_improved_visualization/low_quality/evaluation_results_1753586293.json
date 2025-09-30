@@ -1,0 +1,102 @@
+{
+  "input_info": {
+    "original_path": "low_quality_original",
+    "reconstructed_path": "low_quality_reconstructed",
+    "length_samples": 44100,
+    "length_seconds": 2.0,
+    "sampling_rate": 22050
+  },
+  "stft_losses": {
+    "scale_1": {
+      "n_fft": 1024,
+      "hop_length": 256,
+      "magnitude_l1": 2.141598008778259,
+      "magnitude_l2": 11.804857172152854,
+      "log_magnitude": 1.99285152474237,
+      "spectral_convergence": 0.4008835013799991,
+      "phase_loss": 1.306906528607414,
+      "complex_loss": 15.243001672805232,
+      "perceptual_weighted": 9.675690456125812
+    },
+    "scale_2": {
+      "n_fft": 512,
+      "hop_length": 128,
+      "magnitude_l1": 1.5717979206476183,
+      "magnitude_l2": 5.87192920551452,
+      "log_magnitude": 1.9521662023396302,
+      "spectral_convergence": 0.3996364400557043,
+      "phase_loss": 1.2790019155904138,
+      "complex_loss": 7.63790430266784,
+      "perceptual_weighted": 4.806900248953067
+    },
+    "scale_3": {
+      "n_fft": 256,
+      "hop_length": 64,
+      "magnitude_l1": 1.1622918865942933,
+      "magnitude_l2": 2.909173158052518,
+      "log_magnitude": 1.899287036654427,
+      "spectral_convergence": 0.3984515688046997,
+      "phase_loss": 1.2404275004208871,
+      "complex_loss": 3.815022461512151,
+      "perceptual_weighted": 2.3772158572070547
+    },
+    "average": {
+      "avg_magnitude_l1": 1.6252292720067236,
+      "avg_magnitude_l2": 6.86198651190663,
+      "avg_log_magnitude": 1.9481015879121424,
+      "avg_spectral_convergence": 0.39965717008013435,
+      "avg_phase_loss": 1.275445314872905,
+      "avg_complex_loss": 8.898642812328406,
+      "avg_perceptual_weighted": 5.619935520761977
+    }
+  },
+  "frequency_losses": {
+    "low_freq_l1": 22.009581503005986,
+    "low_freq_l2": 4779.328861855971,
+    "low_freq_correlation": 0.9945603549607644,
+    "mid_freq_l1": 20.39280502809534,
+    "mid_freq_l2": 628.7079775048766,
+    "mid_freq_correlation": 0.044581042740335745,
+    "high_freq_l1": 20.185070968328837,
+    "high_freq_l2": 612.0761589831915,
+    "high_freq_correlation": 0.042346957607838985,
+    "magnitude_mse": 1374.229014289865,
+    "magnitude_mae": 20.591480615391337,
+    "phase_mse": 5.790733332114679,
+    "spectral_correlation": 0.9723641264410968,
+    "phase_correlation": 0.11653793289791986
+  },
+  "perceptual_metrics": {
+    "snr_db": 6.834574060739107,
+    "nrmse": 0.10297032889094038,
+    "audio_ssim": 0.7182058667453841,
+    "dtw_distance": 0.45029059528235327,
+    "zcr_difference": 0.15746388807002426,
+    "spectral_centroid_diff": 1437.9307998477489,
+    "correlation": 0.8982593176295638
+  },
+  "time_domain_losses": {
+    "mse": 0.03992757445445092,
+    "mae": 0.16041020675539694,
+    "rmse": 0.199818854101536,
+    "max_error": 0.8465488924219692,
+    "cosine_similarity": 0.898258665574089
+  },
+  "mel_losses": {
+    "mel_mse": 731.3400160086996,
+    "mel_mae": 5.892568400420162,
+    "log_mel_mse": 136.76133198426038,
+    "log_mel_mae": 10.587144654389428,
+    "mel_correlation": 0.9978289517147202
+  },
+  "overall_score": {
+    "stft_score": 0.7144606703531173,
+    "frequency_score": 0.9723641264410968,
+    "perceptual_score": 0.6772840979865273,
+    "time_domain_score": 0.898258665574089,
+    "mel_score": 0.9978289517147202,
+    "overall_score": 0.8107949172800423,
+    "quality_level": "良好 (Good)"
+  },
+  "timestamp": 1753586293
+}
