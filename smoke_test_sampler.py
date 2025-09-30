@@ -1,4 +1,5 @@
 import os
+import argparse
 import torch
 import soundfile as sf
 
@@ -6,9 +7,23 @@ import soundfile as sf
 from New_pipeline_audioldm2 import AudioLDM2Pipeline
 
 
+def parse_args():
+    p = argparse.ArgumentParser(description="AudioLDM2 sampler smoke test")
+    p.add_argument("--model", type=str, default=os.environ.get("AUDIO_LDM2_MODEL_DIR", "cvssp/audioldm2-music"))
+    p.add_argument("--sampler", type=str, default="dpmpp", choices=["default", "dpmpp", "unipc"], help="sampling method")
+    p.add_argument("--steps", type=int, default=16, help="num inference steps")
+    p.add_argument("--gs", type=float, default=3.5, help="guidance scale")
+    p.add_argument("--seed", type=int, default=1234, help="random seed")
+    p.add_argument("--prompt", type=str, default="Techno music with a strong, upbeat tempo and high melodic riffs")
+    p.add_argument("--length", type=float, default=10.24, help="audio length in seconds")
+    p.add_argument("--output", type=str, default="smoke_test_sampler_output.wav")
+    return p.parse_args()
+
+
 def main():
+    args = parse_args()
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    repo_or_path = os.environ.get("AUDIO_LDM2_MODEL_DIR", "cvssp/audioldm2")
+    repo_or_path = args.model
 
     # 解析本地缓存目录（显式传给 from_pretrained）
     hf_home = os.environ.get("HF_HOME")
@@ -39,26 +54,27 @@ def main():
     pipe = pipe.to(device)
 
     # 使用我们新增的快捷采样器切换：DPMSolver++ + Karras sigmas
-    try:
-        pipe.set_sampler("dpmpp", use_karras_sigmas=True)
-    except Exception as e:
-        print("[smoke_test_sampler] set_sampler failed:", e)
+    if args.sampler != "default":
+        try:
+            pipe.set_sampler(args.sampler, use_karras_sigmas=True)
+        except Exception as e:
+            print("[smoke_test_sampler] set_sampler failed:", e)
 
-    prompt = "Techno music with a strong, upbeat tempo and high melodic riffs"
-    g = torch.Generator(device).manual_seed(1234)
+    prompt = args.prompt
+    g = torch.Generator(device).manual_seed(args.seed)
 
     audio = pipe(
         prompt=prompt,
-        num_inference_steps=16,
-        guidance_scale=3.5,
-        audio_length_in_s=10.24,
+        num_inference_steps=args.steps,
+        guidance_scale=args.gs,
+        audio_length_in_s=args.length,
         generator=g,
         num_waveforms_per_prompt=1,
     ).audios[0]
 
     # 保存到根目录
-    sf.write("smoke_test_sampler_output.wav", audio, 16000)
-    print("Saved: smoke_test_sampler_output.wav")
+    sf.write(args.output, audio, 16000)
+    print(f"Saved: {args.output}")
 
 
 if __name__ == "__main__":
