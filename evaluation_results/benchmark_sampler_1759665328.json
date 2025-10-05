@@ -1,0 +1,218 @@
+[
+  {
+    "model": "cvssp/audioldm2-music",
+    "sampler": "default",
+    "steps": 16,
+    "guidance_scale": 3.5,
+    "seed": 1234,
+    "length": 10.24,
+    "device": "cpu",
+    "runtime_sec": 60.49585318565369,
+    "output_path": "evaluation_results\\audioldm2-music__default_s16_gs3.5_seed1234.wav",
+    "metrics": {
+      "amplitude": {
+        "rms": 0.17565289155700917,
+        "peak": 0.6913341879844666,
+        "crest": 3.9357973663649597,
+        "clipping_ratio": 0.0,
+        "zcr_mean": 0.09519275302262091
+      },
+      "frequency": {
+        "spectral_centroid_hz": 2658.3745302885955,
+        "rolloff_0.85_hz": 97.75390625,
+        "effective_bandwidth_0.95_hz": 1145.21484375,
+        "band_energy_ratio": {
+          "low_0_2k": 0.9546405325189173,
+          "mid_2k_4k": 0.015295838227148207,
+          "high_4k_8k": 0.03006362925393445
+        }
+      },
+      "mel": {
+        "log_mel_mean": -3.535426378250122,
+        "log_mel_std": 2.049715518951416,
+        "high_mel_energy_ratio": 0.008434657898031939,
+        "entropy": 1.0381255149841309
+      }
+    }
+  },
+  {
+    "model": "cvssp/audioldm2-music",
+    "sampler": "default",
+    "steps": 32,
+    "guidance_scale": 3.5,
+    "seed": 1234,
+    "length": 10.24,
+    "device": "cpu",
+    "runtime_sec": 98.28623247146606,
+    "output_path": "evaluation_results\\audioldm2-music__default_s32_gs3.5_seed1234.wav",
+    "metrics": {
+      "amplitude": {
+        "rms": 0.17695524454708914,
+        "peak": 0.6499298810958862,
+        "crest": 3.672848932843779,
+        "clipping_ratio": 0.0,
+        "zcr_mean": 0.09700723966458659
+      },
+      "frequency": {
+        "spectral_centroid_hz": 2676.324877722676,
+        "rolloff_0.85_hz": 105.859375,
+        "effective_bandwidth_0.95_hz": 1965.625,
+        "band_energy_ratio": {
+          "low_0_2k": 0.9503662711820775,
+          "mid_2k_4k": 0.017189925798746498,
+          "high_4k_8k": 0.032443803019175876
+        }
+      },
+      "mel": {
+        "log_mel_mean": -3.4669137001037598,
+        "log_mel_std": 2.0786502361297607,
+        "high_mel_energy_ratio": 0.009232109198403443,
+        "entropy": 1.051652193069458
+      }
+    }
+  },
+  {
+    "model": "cvssp/audioldm2-music",
+    "sampler": "dpmpp",
+    "steps": 16,
+    "guidance_scale": 3.5,
+    "seed": 1234,
+    "length": 10.24,
+    "device": "cpu",
+    "runtime_sec": 57.32384419441223,
+    "output_path": "evaluation_results\\audioldm2-music__dpmpp_s16_gs3.5_seed1234.wav",
+    "metrics": {
+      "amplitude": {
+        "rms": 0.1668602773813225,
+        "peak": 0.6649906039237976,
+        "crest": 3.9853140265619222,
+        "clipping_ratio": 0.0,
+        "zcr_mean": 0.10108107449297972
+      },
+      "frequency": {
+        "spectral_centroid_hz": 2574.6211422573233,
+        "rolloff_0.85_hz": 102.83203125,
+        "effective_bandwidth_0.95_hz": 1042.578125,
+        "band_energy_ratio": {
+          "low_0_2k": 0.9558625349416762,
+          "mid_2k_4k": 0.01563859726709556,
+          "high_4k_8k": 0.02849886779122825
+        }
+      },
+      "mel": {
+        "log_mel_mean": -3.7107226848602295,
+        "log_mel_std": 2.1626152992248535,
+        "high_mel_energy_ratio": 0.008247739923406501,
+        "entropy": 1.0815246105194092
+      }
+    }
+  },
+  {
+    "model": "cvssp/audioldm2-music",
+    "sampler": "dpmpp",
+    "steps": 32,
+    "guidance_scale": 3.5,
+    "seed": 1234,
+    "length": 10.24,
+    "device": "cpu",
+    "runtime_sec": 103.02558374404907,
+    "output_path": "evaluation_results\\audioldm2-music__dpmpp_s32_gs3.5_seed1234.wav",
+    "metrics": {
+      "amplitude": {
+        "rms": 0.17011838818671038,
+        "peak": 0.7702439427375793,
+        "crest": 4.527693631168266,
+        "clipping_ratio": 0.0,
+        "zcr_mean": 0.09986684623634945
+      },
+      "frequency": {
+        "spectral_centroid_hz": 2658.653488150136,
+        "rolloff_0.85_hz": 113.18359375,
+        "effective_bandwidth_0.95_hz": 2165.13671875,
+        "band_energy_ratio": {
+          "low_0_2k": 0.9484592554995233,
+          "mid_2k_4k": 0.01853064749779575,
+          "high_4k_8k": 0.03301009700268102
+        }
+      },
+      "mel": {
+        "log_mel_mean": -3.5453550815582275,
+        "log_mel_std": 2.1408097743988037,
+        "high_mel_energy_ratio": 0.009630726509730252,
+        "entropy": 1.0820516347885132
+      }
+    }
+  },
+  {
+    "model": "cvssp/audioldm2-music",
+    "sampler": "unipc",
+    "steps": 16,
+    "guidance_scale": 3.5,
+    "seed": 1234,
+    "length": 10.24,
+    "device": "cpu",
+    "runtime_sec": 55.40357446670532,
+    "output_path": "evaluation_results\\audioldm2-music__unipc_s16_gs3.5_seed1234.wav",
+    "metrics": {
+      "amplitude": {
+        "rms": 0.16762687023357956,
+        "peak": 0.7069972157478333,
+        "crest": 4.21768428153952,
+        "clipping_ratio": 0.0,
+        "zcr_mean": 0.09941436719968799
+      },
+      "frequency": {
+        "spectral_centroid_hz": 2569.3912105168333,
+        "rolloff_0.85_hz": 99.609375,
+        "effective_bandwidth_0.95_hz": 662.20703125,
+        "band_energy_ratio": {
+          "low_0_2k": 0.959148296738848,
+          "mid_2k_4k": 0.01375556265711143,
+          "high_4k_8k": 0.0270961406040406
+        }
+      },
+      "mel": {
+        "log_mel_mean": -3.727332353591919,
+        "log_mel_std": 2.112356424331665,
+        "high_mel_energy_ratio": 0.007573125991533233,
+        "entropy": 1.057486891746521
+      }
+    }
+  },
+  {
+    "model": "cvssp/audioldm2-music",
+    "sampler": "unipc",
+    "steps": 32,
+    "guidance_scale": 3.5,
+    "seed": 1234,
+    "length": 10.24,
+    "device": "cpu",
+    "runtime_sec": 100.08610844612122,
+    "output_path": "evaluation_results\\audioldm2-music__unipc_s32_gs3.5_seed1234.wav",
+    "metrics": {
+      "amplitude": {
+        "rms": 0.17077389130034507,
+        "peak": 0.7941485643386841,
+        "crest": 4.650292607913886,
+        "clipping_ratio": 0.0,
+        "zcr_mean": 0.09702552164586584
+      },
+      "frequency": {
+        "spectral_centroid_hz": 2659.875817625591,
+        "rolloff_0.85_hz": 106.4453125,
+        "effective_bandwidth_0.95_hz": 1867.96875,
+        "band_energy_ratio": {
+          "low_0_2k": 0.9510543509781608,
+          "mid_2k_4k": 0.017252193004678805,
+          "high_4k_8k": 0.031693456017160455
+        }
+      },
+      "mel": {
+        "log_mel_mean": -3.5438475608825684,
+        "log_mel_std": 2.1081719398498535,
+        "high_mel_energy_ratio": 0.009079407373532265,
+        "entropy": 1.063730239868164
+      }
+    }
+  }
+]
