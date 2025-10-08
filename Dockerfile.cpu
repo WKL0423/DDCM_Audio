@@ -1,0 +1,33 @@
+# CPU-only Dockerfile for AudioLDM2 tooling
+# Base: Python 3.10 slim
+FROM python:3.10-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HOME=/workspace/hf_cache \
+    HUGGINGFACE_HUB_CACHE=/workspace/hf_cache/huggingface/hub
+
+# System deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    ffmpeg \
+    libsndfile1 \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+
+# Copy minimal requirements first for better Docker layer caching
+COPY requirements-core.txt /workspace/requirements-core.txt
+
+# Install PyTorch CPU wheels (2.2.1) from PyPI
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir torch==2.2.1 torchaudio==2.2.1 torchvision==0.17.1 --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r /workspace/requirements-core.txt
+
+# Copy project
+COPY . /workspace
+
+# Default cmd prints help
+CMD ["python", "smoke_test_sampler.py", "--help"]

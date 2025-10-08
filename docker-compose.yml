@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  audioldm2-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    image: audioldm2:cpu
+    environment:
+      - HF_HOME=/workspace/hf_cache
+      - HUGGINGFACE_HUB_CACHE=/workspace/hf_cache/huggingface/hub
+    volumes:
+      - ./:/workspace
+      - hf_cache:/workspace/hf_cache
+    command: ["python", "smoke_test_sampler.py", "--sampler", "dpmpp", "--steps", "16", "--prompt", "a minimal techno beat", "--output", "evaluation_results/docker_cpu_test.wav"]
+
+  audioldm2-gpu:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: audioldm2:cuda
+    environment:
+      - HF_HOME=/workspace/hf_cache
+      - HUGGINGFACE_HUB_CACHE=/workspace/hf_cache/huggingface/hub
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+    volumes:
+      - ./:/workspace
+      - hf_cache:/workspace/hf_cache
+    command: ["python", "smoke_test_sampler.py", "--sampler", "dpmpp", "--steps", "16", "--prompt", "a minimal techno beat", "--output", "evaluation_results/docker_gpu_test.wav"]
+
+volumes:
+  hf_cache:
