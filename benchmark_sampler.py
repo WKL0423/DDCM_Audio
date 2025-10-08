@@ -22,7 +22,8 @@ def resolve_cache_dir():
     return r"F:\\Kasai_Lab\\hf_cache\\huggingface\\hub"
 
 
-def run_once(model, sampler, steps, gs, prompt, length, seed, cache_dir, device, out_dir):
+def run_once(model, sampler, steps, gs, prompt, length, seed, cache_dir, device, out_dir,
+             use_karras: bool = True, timestep_spacing: str = None):
     pipe = AudioLDM2Pipeline.from_pretrained(
         model,
         torch_dtype=torch.float16 if device == "cuda" else torch.float32,
@@ -31,7 +32,11 @@ def run_once(model, sampler, steps, gs, prompt, length, seed, cache_dir, device,
 
     if sampler != "default":
         try:
-            pipe.set_sampler(sampler, use_karras_sigmas=True)
+            # allow optional spacing
+            if timestep_spacing is not None:
+                pipe.set_sampler(sampler, use_karras_sigmas=use_karras, timestep_spacing=timestep_spacing)
+            else:
+                pipe.set_sampler(sampler, use_karras_sigmas=use_karras)
         except Exception as e:
             print(f"[benchmark] set_sampler failed for {sampler}: {e}")
 
@@ -67,6 +72,8 @@ def run_once(model, sampler, steps, gs, prompt, length, seed, cache_dir, device,
         "runtime_sec": dt,
         "output_path": str(out_path),
         "metrics": metrics,
+        "use_karras": use_karras,
+        "timestep_spacing": timestep_spacing,
     }
 
 
@@ -75,36 +82,64 @@ def main():
     ap.add_argument("--model", default=os.environ.get("AUDIO_LDM2_MODEL_DIR", "cvssp/audioldm2-music"))
     ap.add_argument("--samplers", nargs="*", default=["default", "dpmpp", "unipc"])
     ap.add_argument("--steps", nargs="*", type=int, default=[16, 32, 50, 100])
-    ap.add_argument("--gs", type=float, default=3.5)
+    ap.add_argument("--gs", type=float, default=None, help="Single guidance scale (deprecated by --gs-list)")
+    ap.add_argument("--gs-list", nargs="*", type=float, default=[3.5], help="Multiple guidance scales to sweep")
     ap.add_argument("--prompt", default="Techno music with a strong, upbeat tempo and high melodic riffs")
     ap.add_argument("--length", type=float, default=10.24)
-    ap.add_argument("--seed", type=int, default=1234)
+    ap.add_argument("--seed", type=int, default=None, help="Single seed (deprecated by --seeds)")
+    ap.add_argument("--seeds", nargs="*", type=int, default=[1234], help="Multiple seeds to sweep")
     ap.add_argument("--out", default="evaluation_results")
+    ap.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto")
+    ap.add_argument("--no-karras", action="store_true", help="Disable Karras sigmas for samplers that support it")
+    ap.add_argument("--timestep-spacing", choices=["linspace", "leading", "trailing"], default=None)
+    ap.add_argument("--dry-run", action="store_true", help="Parse and list planned runs without executing")
     args = ap.parse_args()
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    if args.gs is not None and args.gs_list == [3.5]:
+        # Backward-compat: if --gs provided and --gs-list not customized, use single value
+        gs_list = [args.gs]
+    else:
+        gs_list = args.gs_list
+
+    seeds = [args.seed] if (args.seed is not None and args.seeds == [1234]) else args.seeds
+
+    if args.device == "auto":
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+    else:
+        device = args.device
+
     cache_dir = resolve_cache_dir()
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    combos = list(itertools.product(args.samplers, args.steps, gs_list, seeds))
+    print(f"[benchmark] planned runs: {len(combos)}")
+    for sampler, steps, gs, seed in combos:
+        print(f"  - sampler={sampler}, steps={steps}, gs={gs}, seed={seed}, device={device}, karras={not args.no_karras}, spacing={args.timestep_spacing}")
+
+    if args.dry_run:
+        print("[benchmark] dry-run enabled, exiting before execution.")
+        return
+
     results = []
-    for sampler, steps in itertools.product(args.samplers, args.steps):
-        print(f"\n[benchmark] model={args.model} sampler={sampler} steps={steps} gs={args.gs} device={device}")
+    for sampler, steps, gs, seed in combos:
+        print(f"\n[benchmark] model={args.model} sampler={sampler} steps={steps} gs={gs} seed={seed} device={device}")
         metrics = run_once(
             model=args.model,
             sampler=sampler,
             steps=steps,
-            gs=args.gs,
+            gs=gs,
             prompt=args.prompt,
             length=args.length,
-            seed=args.seed,
+            seed=seed,
             cache_dir=cache_dir,
             device=device,
             out_dir=out_dir,
+            use_karras=(not args.no_karras),
+            timestep_spacing=args.timestep_spacing,
         )
         results.append(metrics)
 
-    # Save json
     ts = int(time.time())
     json_path = out_dir / f"benchmark_sampler_{ts}.json"
     with open(json_path, "w", encoding="utf-8") as f:
