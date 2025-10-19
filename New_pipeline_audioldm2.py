@@ -263,6 +263,23 @@ class AudioLDM2Pipeline(DiffusionPipeline):
         )
         self.vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1) if getattr(self, "vae", None) else 8
 
+        # ========== DDCM 每步噪声注入回调（可选）==========
+        # 中文说明：
+        # - 我们在扩散的每个时间步 t，允许外部通过回调函数提供一个离散噪声 z_t（来自代码本）。
+        # - 若调度器 step(...) 支持 variance_noise 参数，则将 z_t 注入到方差项；否则走后备路径手动加入噪声。
+        # - 默认不启用；可通过 set_ddcm_step_callback(...) 开启。
+        self._ddcm_step_callback = None  # 形如 fn(step_index:int, t:torch.Tensor, latent_shape:Tuple[int], device, dtype) -> Optional[torch.Tensor]
+
+    def set_ddcm_step_callback(self, fn: Optional[Callable[[int, torch.Tensor, tuple, torch.device, torch.dtype], Optional[torch.Tensor]]]):
+        """
+        设置 DDCM 每步噪声注入回调。
+
+        参数：
+        - fn: 回调函数，签名为 (step_index, t, latent_shape, device, dtype) -> z_t 或 None。
+              返回的 z_t 应与 latents 形状一致或可广播；None 表示本步不注入。
+        """
+        self._ddcm_step_callback = fn
+
     # Copied from diffusers.pipelines.pipeline_utils.StableDiffusionMixin.enable_vae_slicing
     def enable_vae_slicing(self):
         r"""
@@ -828,6 +845,8 @@ class AudioLDM2Pipeline(DiffusionPipeline):
         accepts_generator = "generator" in set(inspect.signature(self.scheduler.step).parameters.keys())
         if accepts_generator:
             extra_step_kwargs["generator"] = generator
+        # 中文说明：把 variance_noise 能力标注在 kwargs 上（仅标识，不在此时赋值），循环内按需填充。
+        extra_step_kwargs["__accepts_variance_noise__"] = "variance_noise" in set(inspect.signature(self.scheduler.step).parameters.keys())
         return extra_step_kwargs
 
     def check_inputs(
@@ -1165,8 +1184,34 @@ class AudioLDM2Pipeline(DiffusionPipeline):
                     noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
                     noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
 
-                # compute the previous noisy sample x_t -> x_t-1
-                latents = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs).prev_sample
+                # ========== DDCM：若已设置回调，则在本步注入离散噪声 z_t ==========
+                variance_kwargs = {}
+                z_t = None
+                if getattr(self, "_ddcm_step_callback", None) is not None:
+                    # 回调提供 z_t（形状与 latents 相容）
+                    latent_shape = tuple(latents.shape)
+                    z_t = self._ddcm_step_callback(i, t, latent_shape, device, latents.dtype)
+                    if z_t is not None:
+                        # 若调度器支持 variance_noise，则通过 kwargs 注入
+                        if extra_step_kwargs.get("__accepts_variance_noise__", False):
+                            variance_kwargs["variance_noise"] = z_t
+                        # 否则走后备路径：先正常 step，再把噪声手动加到 prev_sample 上（近似，依赖具体调度器公式）
+
+                # 先执行一步调度器（可能带 variance_noise）
+                if variance_kwargs:
+                    step_out = self.scheduler.step(noise_pred, t, latents, **{k:v for k,v in extra_step_kwargs.items() if not k.startswith("__")}, **variance_kwargs)
+                    latents = step_out.prev_sample
+                else:
+                    step_out = self.scheduler.step(noise_pred, t, latents, **{k:v for k,v in extra_step_kwargs.items() if not k.startswith("__")})
+                    latents = step_out.prev_sample
+
+                # 若没有 variance_noise 能力但回调给了 z_t，则尝试按“后备路径”将噪声加到当前样本
+                # 注意：这里没有准确的 σ_t/方差权重，仅作为占位逻辑；后续在具体调度器上精确化
+                if z_t is not None and not extra_step_kwargs.get("__accepts_variance_noise__", False):
+                    try:
+                        latents = latents + z_t
+                    except Exception:
+                        pass
 
                 # call the callback, if provided
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
