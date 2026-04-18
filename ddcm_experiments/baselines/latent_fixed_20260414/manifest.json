@@ -1,0 +1,118 @@
+{
+  "pack_name": "latent_fixed_20260414",
+  "created_at_utc": "2026-04-14T03:01:48.616837+00:00",
+  "comparison_role": "fixed latent baseline pack for quality-first tracking",
+  "sources": {
+    "step1": {
+      "quality": "runs/baseline/piano_t10k16_metrics.json",
+      "flow": "runs/baseline/piano_t10k16_flow_metrics.json",
+      "size": "runs/baseline/piano_t10k16_size.json",
+      "verdict": "runs/baseline/step1_baseline_verdict.json"
+    },
+    "routeB_phase1_default": {
+      "manifest": "ddcm_experiments/routeB_runs/20260403_115112_p1_baseline_default/routeB_manifest.json",
+      "quality": "ddcm_experiments/routeB_runs/20260403_115112_p1_baseline_default/quality_metrics.json"
+    },
+    "routeB_phase1_real_techno": {
+      "manifest": "ddcm_experiments/routeB_runs/20260403_155644_p1_real_techno/routeB_manifest.json",
+      "quality": "ddcm_experiments/routeB_runs/20260403_155644_p1_real_techno/quality_metrics.json"
+    }
+  },
+  "records": [
+    {
+      "id": "step1_piano_t10_k16",
+      "route": "audio_compression_roundtrip",
+      "metrics": {
+        "sr": 16000,
+        "duration_sec": 10.0,
+        "waveform_mse": 0.009251870214939117,
+        "waveform_mae": 0.07532193511724472,
+        "snr_db": -1.231804869647216,
+        "pearson_corr": 0.007789811585098505,
+        "stft_mag_mse": 2.6509525775909424,
+        "mel_db_mae": 10.563952445983887,
+        "spectral_centroid_l1": 355.1777648925781,
+        "n_fft": 1024,
+        "hop": 256,
+        "n_mels": 128
+      },
+      "flow_metrics": {
+        "sr": 16000,
+        "duration_sec": 10.242,
+        "waveform_mse": 0.0,
+        "waveform_mae": 0.0,
+        "snr_db": 93.77460018936921,
+        "pearson_corr": 1.000002145767212,
+        "stft_mag_mse": 0.0,
+        "mel_db_mae": 0.0,
+        "spectral_centroid_l1": 0.0,
+        "n_fft": 1024,
+        "hop": 256,
+        "n_mels": 128
+      },
+      "size": {
+        "orig_wav_bytes": 640058,
+        "bitstream_bin_bytes": 5,
+        "bitstream_json_bytes": 1815,
+        "bitstream_total_bytes": 1820,
+        "ratio_vs_orig": 351.68
+      },
+      "verdict": {
+        "flow_through_pass": true,
+        "quality_pass": false,
+        "overall_step1_pass": true,
+        "ready_for_step2_quality_optimization": true
+      }
+    },
+    {
+      "id": "routeB_phase1_synthetic_techno_k512_t64",
+      "route": "routeB_phase1_latent_codec_only",
+      "codec": {
+        "K": 512,
+        "T": 64,
+        "seed": 1234,
+        "mode": "omp"
+      },
+      "size": {
+        "json_bytes": 293,
+        "npz_bytes": 1561,
+        "total_bytes": 1854
+      },
+      "metrics": {
+        "si_sdr_db": -47.939076127506546,
+        "log_mel_mse": 4.000787258148193,
+        "log_mel_corr": 0.2649338946847749,
+        "band_0_2k_ratio": 0.00121785063252245,
+        "band_2_4k_ratio": 0.031320251686708,
+        "band_4_nyq_ratio": 0.03220648491493301,
+        "samples_compared": 163840,
+        "sample_rate": 16000
+      }
+    },
+    {
+      "id": "routeB_phase1_real_techno_k512_t64",
+      "route": "routeB_phase1_latent_codec_only",
+      "codec": {
+        "K": 512,
+        "T": 64,
+        "seed": 1234,
+        "mode": "omp"
+      },
+      "size": {
+        "json_bytes": 293,
+        "npz_bytes": 1560,
+        "total_bytes": 1853
+      },
+      "metrics": {
+        "si_sdr_db": -50.54142834999944,
+        "log_mel_mse": 7.381407737731934,
+        "log_mel_corr": 0.25084653771398346,
+        "band_0_2k_ratio": 0.008437526746191094,
+        "band_2_4k_ratio": 0.038969465870020904,
+        "band_4_nyq_ratio": 0.06608609712435101,
+        "samples_compared": 160000,
+        "sample_rate": 16000
+      }
+    }
+  ]
+}

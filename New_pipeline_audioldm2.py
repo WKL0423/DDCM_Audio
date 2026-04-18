@@ -1144,6 +1144,24 @@ class AudioLDM2Pipeline(DiffusionPipeline):
 
         # 4. Prepare timesteps
         self.scheduler.set_timesteps(num_inference_steps, device=device)
+        # 某些版本在满步数下可能给出等于 num_train_timesteps 的 t，需裁剪到 [0, num_train_timesteps-1]
+        try:
+            _max_t = int(getattr(self.scheduler.config, "num_train_timesteps", 1000)) - 1
+        except Exception:
+            _max_t = 999
+        try:
+            _ts = []
+            for _t in self.scheduler.timesteps:
+                _ti = int(_t) if not isinstance(_t, int) else _t
+                if _ti > _max_t:
+                    _ti = _max_t
+                if _ti < 0:
+                    _ti = 0
+                _ts.append(_ti)
+            import torch as _torch
+            self.scheduler.timesteps = _torch.tensor(_ts, device=device, dtype=getattr(self.scheduler.timesteps, "dtype", _torch.long))
+        except Exception:
+            pass
         timesteps = self.scheduler.timesteps
 
         # 5. Prepare latent variables
@@ -1189,8 +1207,14 @@ class AudioLDM2Pipeline(DiffusionPipeline):
                 z_t = None
                 if getattr(self, "_ddcm_step_callback", None) is not None:
                     # 回调提供 z_t（形状与 latents 相容）
+                    # 为便于方法三（前向一致性）选择，这里尽量把上下文传给回调：
+                    # 优先尝试新签名：fn(i, t, latents, noise_pred, latent_shape, device, dtype, scheduler)
+                    # 若不兼容，则回退到旧签名：fn(i, t, latent_shape, device, dtype)
                     latent_shape = tuple(latents.shape)
-                    z_t = self._ddcm_step_callback(i, t, latent_shape, device, latents.dtype)
+                    try:
+                        z_t = self._ddcm_step_callback(i, t, latents, noise_pred, latent_shape, device, latents.dtype, self.scheduler)
+                    except TypeError:
+                        z_t = self._ddcm_step_callback(i, t, latent_shape, device, latents.dtype)
                     if z_t is not None:
                         # 若调度器支持 variance_noise，则通过 kwargs 注入
                         if extra_step_kwargs.get("__accepts_variance_noise__", False):

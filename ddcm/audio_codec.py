@@ -8,7 +8,7 @@ from typing import Dict, Optional
 import numpy as np
 import torch
 
-from .codebook import create_codebook
+from .codebook import load_or_create_codebook
 from .runner import compress_latent, decompress_latent
 
 
@@ -17,7 +17,8 @@ class CodecConfig:
     K: int = 256
     T: int = 16
     seed: int = 1234
-    mode: str = "coord"  # "coord" (coordinate basis) or "random" (requires codebook)
+    # 说明：严格禁用 coord 模式，默认改为 random（基于码本的匹配追踪）
+    mode: str = "random"  # 可选："random"（需要码本）；不再使用 "coord"
 
 
 def _resolve_cache_dir() -> str:
@@ -33,20 +34,38 @@ def _resolve_cache_dir() -> str:
 
 
 def build_codebook(latent_shape: torch.Size, cfg: CodecConfig, device: torch.device, dtype: torch.dtype) -> torch.Tensor:
-    # latent_shape is [B,C,H,W] from VAE encode; use [C,H,W]
+    """
+    构建/加载本地持久化码本：不存入比特流，仅在本地 codebooks/ 下缓存。
+    """
     C, H, W = int(latent_shape[1]), int(latent_shape[2]), int(latent_shape[3])
-    cb = create_codebook((C, H, W), K=cfg.K, seed=cfg.seed, device=device, dtype=dtype)
+    cb = load_or_create_codebook((C, H, W), K=cfg.K, seed=cfg.seed, device=device, dtype=dtype)
     return cb
 
 
 def _load_audio_mel_and_latent(pipeline, wav_path: str, device: torch.device) -> Dict:
+    """
+    加载 wav 并提取与训练流程一致的对数 Mel 频谱（不依赖 librosa）。
+    参考 STEP1：
+    - 先做反射 padding，长度为 (n_fft - hop)//2
+    - torch.stft(..., center=False, hann window, return_complex=True)
+    - 取幅度谱 |STFT|
+    - 乘以 Slaney 标定的 Mel 滤波器（torchaudio 实现），n_mels=64, fmax=8000
+    - log(clamp(., 1e-5))
+    - 按目标帧长 padding/裁剪
+    输出形状 [1,1,T,64]
+    """
     import torchaudio
+    import torch.nn.functional as F
 
-    # Settings aligned with step1_training_matched_vae_reconstruction_fixed
     sr_target = 16000
     duration = 10.24
     hop_length = 160
+    n_fft = 1024
+    win_length = 1024
+    n_mels = 64
+    f_min, f_max = 0.0, 8000.0
 
+    # 读取并重采样到 16k，混合为单声道，裁剪到固定长度
     wav, sr = torchaudio.load(wav_path)
     if sr != sr_target:
         wav = torchaudio.transforms.Resample(sr, sr_target)(wav)
@@ -57,36 +76,53 @@ def _load_audio_mel_and_latent(pipeline, wav_path: str, device: torch.device) ->
         wav = wav[..., :max_len]
     wav_np = wav.squeeze(0).numpy()
 
-    # Reuse pipeline's VAE-friendly mel via its own methods if available.
-    # Here we mimic by calling the VAE.encode directly on precomputed mel from step1 util if present.
-    # For simplicity, we reuse the VAE path: compute mel via pipeline.vae expected input.
-    # The pipeline expects log-mel [B,1,T,F]; we'll reconstruct it by using its own helper if exists.
-    # Fallback: use a minimal mel extraction similar to step1.
-    try:
-        from step1_training_matched_vae_reconstruction_fixed import TrainingMatchedVAEReconstructor
+    # 反射 padding（与训练一致）
+    pad = int((n_fft - hop_length) // 2)
+    wav_pad = F.pad(wav.unsqueeze(1), (pad, pad), mode="reflect").squeeze(1)
 
-        recon = TrainingMatchedVAEReconstructor()
-        mel = recon.extract_mel_spectrogram(wav_np).to(device)
-        if device.type == "cuda":
-            mel = mel.half()
+    # STFT 幅度谱（center=False）
+    window = torch.hann_window(win_length, device=wav.device)
+    stft = torch.stft(
+        wav_pad,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=False,
+        normalized=False,
+        onesided=True,
+        return_complex=True,
+    )  # [1, freq, frames]
+    mag = torch.abs(stft)
+
+    # Mel 滤波（Slaney 标定）；将 [freq, frames] -> [n_mels, frames]
+    mel_scale = torchaudio.transforms.MelScale(
+        n_mels=n_mels,
+        sample_rate=sr_target,
+        f_min=f_min,
+        f_max=f_max,
+        n_stft=n_fft // 2 + 1,
+        norm="slaney",
+        mel_scale="slaney",
+    )
+    mel_spec = mel_scale(mag)  # [1, n_mels, frames]
+    mel_log = torch.log(torch.clamp(mel_spec, min=1e-5))
+
+    # 按目标帧长 padding/裁剪
+    target_len = int(duration * sr_target / hop_length)
+    T_cur = mel_log.shape[-1]
+    if T_cur < target_len:
+        mel_log = F.pad(mel_log, (0, target_len - T_cur))
+    elif T_cur > target_len:
+        mel_log = mel_log[..., :target_len]
+
+    # 调整为 [B,1,T,F]
+    mel = mel_log.permute(0, 2, 1).unsqueeze(1).to(device)
+    try:
+        vae_dtype = next(pipeline.vae.parameters()).dtype
     except Exception:
-        # Minimal mel using librosa
-        import librosa
-        mels = librosa.feature.melspectrogram(
-            y=wav_np,
-            sr=sr_target,
-            n_fft=1024,
-            hop_length=hop_length,
-            win_length=1024,
-            n_mels=64,
-            fmin=0,
-            fmax=8000,
-            center=False,
-            power=2.0,
-        )
-        mel = torch.log(torch.clamp(torch.from_numpy(mels).float(), min=1e-5)).t().unsqueeze(0).unsqueeze(0).to(device)
-        if device.type == "cuda":
-            mel = mel.half()
+        vae_dtype = torch.float16 if device.type == "cuda" else torch.float32
+    mel = mel.to(dtype=vae_dtype)
 
     with torch.no_grad():
         enc = pipeline.vae.encode(mel)
@@ -125,10 +161,13 @@ def compress_audio_to_bitstream(
     io = _load_audio_mel_and_latent(pipe, wav_path, device)
     latent = io["latent"]  # [1,C,H,W]
 
-    codebook = None
-    if (cfg.mode or "coord").lower() == "random":
-        codebook = build_codebook(latent.shape, cfg, device, latent.dtype)
-    stream = compress_latent(latent, codebook, T=cfg.T, mode=cfg.mode)
+    # 仅允许 random 模式（基于固定码本）
+    mode_lower = (cfg.mode or "random").lower()
+    if mode_lower != "random":
+        raise ValueError("当前实现禁止使用 coord 模式，请使用 --mode random")
+
+    codebook = build_codebook(latent.shape, cfg, device, latent.dtype)
+    stream = compress_latent(latent, codebook, T=cfg.T, mode="random")
 
     meta = {
         "model_name": model_name,
@@ -160,9 +199,12 @@ def decompress_audio_from_bitstream(bitstream: Dict, out_wav_path: Optional[str]
     # rebuild codebook and latent
     C, H, W = stream["shape"]
     latent_shape = [1, C, H, W]
-    codebook = None
-    if (cfg.mode or "coord").lower() == "random":
-        codebook = build_codebook(torch.Size(latent_shape), cfg, device, dtype)
+    # 仅允许 random 模式；为兼容旧数据，这里若遇到 coord 会给出清晰错误
+    mode_lower = (cfg.mode or "random").lower()
+    if mode_lower != "random":
+        raise ValueError("比特流 meta 指示为 coord 模式，当前版本不再支持该模式")
+
+    codebook = build_codebook(torch.Size(latent_shape), cfg, device, dtype)
     latent_rec = decompress_latent(stream, codebook, device=device, dtype=dtype)
 
     wav = _decode_latent_to_audio(pipe, latent_rec)

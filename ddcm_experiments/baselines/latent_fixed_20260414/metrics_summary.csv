@@ -1,0 +1,4 @@
+record_id,route,pearson_corr,snr_db,mel_db_mae,si_sdr_db,log_mel_corr,bitstream_total_bytes,ratio_vs_orig
+step1_piano_t10_k16,audio_compression_roundtrip,0.007789811585098505,-1.231804869647216,10.563952445983887,,,1820,351.68
+routeB_phase1_synthetic_techno_k512_t64,routeB_phase1_latent_codec_only,,,,-47.939076127506546,0.2649338946847749,1854,
+routeB_phase1_real_techno_k512_t64,routeB_phase1_latent_codec_only,,,,-50.54142834999944,0.25084653771398346,1853,

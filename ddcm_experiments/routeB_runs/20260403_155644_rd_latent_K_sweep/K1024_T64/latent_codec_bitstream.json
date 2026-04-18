@@ -1,0 +1,19 @@
+{
+  "codec_version": 2,
+  "model_name": "cvssp/audioldm2-music",
+  "cfg": {
+    "K": 1024,
+    "T": 64,
+    "seed": 1234,
+    "mode": "omp"
+  },
+  "latent_shape": [
+    1,
+    8,
+    256,
+    16
+  ],
+  "vae_scaling_factor": 0.4110932946205139,
+  "sr": 16000,
+  "mode": "omp"
+}

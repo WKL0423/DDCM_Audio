@@ -1,0 +1,4 @@
+﻿K,T,total_payload_bytes,si_sdr_db,log_mel_mse,log_mel_corr,run_subdir
+256,64,1836,-47.95819186357213,7.397330284118652,0.2470741655305724,F:\Kasai_Lab\Code\AudioLDM_2_diffuser\ddcm_experiments\routeB_runs\20260403_155644_rd_latent_K_sweep\K256_T64
+512,64,1853,-50.54142834999944,7.381407737731934,0.25084653771398346,F:\Kasai_Lab\Code\AudioLDM_2_diffuser\ddcm_experiments\routeB_runs\20260403_155644_rd_latent_K_sweep\K512_T64
+1024,64,1868,-52.22071229142888,7.317975997924805,0.26735758532666154,F:\Kasai_Lab\Code\AudioLDM_2_diffuser\ddcm_experiments\routeB_runs\20260403_155644_rd_latent_K_sweep\K1024_T64

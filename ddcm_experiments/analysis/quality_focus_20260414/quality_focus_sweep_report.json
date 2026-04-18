@@ -1,0 +1,83 @@
+{
+  "baseline": {
+    "id": "step1_piano_t10_k16",
+    "pearson_corr": 0.007789811585098505,
+    "mel_db_mae": 10.563952445983887,
+    "snr_db": -1.231804869647216
+  },
+  "ranking_rule": "corr desc, mel_db_mae asc, snr_db desc",
+  "top_candidates": [
+    {
+      "source": "quality_push_large_codebook",
+      "name": "runs/quality_push_large_codebook/T=100_in900-80_K=128_P=2_CB=4_model=audioldm2-music_audio",
+      "corr": 0.07100893557071686,
+      "snr_db": -1.3874041375621584,
+      "mel_db_mae": 5.679022312164307,
+      "bitstream_total_bytes": 18905,
+      "ratio_vs_orig": 33.85654588733139,
+      "delta_corr_vs_baseline": 0.06321912398561835,
+      "delta_mel_db_mae_vs_baseline": -4.88493013381958,
+      "delta_snr_db_vs_baseline": -0.1555992679149425
+    },
+    {
+      "source": "quality_push_large_codebook",
+      "name": "runs/quality_push_large_codebook/T=100_in900-80_K=1000_P=2_CB=4_model=audioldm2-music_audio",
+      "corr": 0.04707600548863411,
+      "snr_db": -1.6370749910333964,
+      "mel_db_mae": 5.265000343322754,
+      "bitstream_total_bytes": 19034,
+      "ratio_vs_orig": 33.62708836818325,
+      "delta_corr_vs_baseline": 0.039286193903535604,
+      "delta_mel_db_mae_vs_baseline": -5.298952102661133,
+      "delta_snr_db_vs_baseline": -0.40527012138618046
+    },
+    {
+      "source": "multiobjective_pareto_push",
+      "name": "eta_tail_200_0p9_80",
+      "corr": 0.025721319563065965,
+      "snr_db": -1.168553009065774,
+      "mel_db_mae": 6.648435910542806,
+      "bitstream_total_bytes": -1,
+      "ratio_vs_orig": -1.0,
+      "delta_corr_vs_baseline": 0.01793150797796746,
+      "delta_mel_db_mae_vs_baseline": -3.915516535441081,
+      "delta_snr_db_vs_baseline": 0.06325186058144183
+    },
+    {
+      "source": "generalization_push",
+      "name": "new_best_schedule_eta_tail",
+      "corr": 0.025721319563065965,
+      "snr_db": -1.168553009065774,
+      "mel_db_mae": 6.648435910542806,
+      "bitstream_total_bytes": -1,
+      "ratio_vs_orig": -1.0,
+      "delta_corr_vs_baseline": 0.01793150797796746,
+      "delta_mel_db_mae_vs_baseline": -3.915516535441081,
+      "delta_snr_db_vs_baseline": 0.06325186058144183
+    },
+    {
+      "source": "multiobjective_pareto_push",
+      "name": "eta_tail_200_0p92_80",
+      "corr": 0.025499419192783535,
+      "snr_db": -1.16803626864105,
+      "mel_db_mae": 6.646798769632976,
+      "bitstream_total_bytes": -1,
+      "ratio_vs_orig": -1.0,
+      "delta_corr_vs_baseline": 0.01770960760768503,
+      "delta_mel_db_mae_vs_baseline": -3.917153676350911,
+      "delta_snr_db_vs_baseline": 0.06376860100616599
+    }
+  ],
+  "recommended_candidate": {
+    "source": "quality_push_large_codebook",
+    "name": "runs/quality_push_large_codebook/T=100_in900-80_K=128_P=2_CB=4_model=audioldm2-music_audio",
+    "corr": 0.07100893557071686,
+    "snr_db": -1.3874041375621584,
+    "mel_db_mae": 5.679022312164307,
+    "bitstream_total_bytes": 18905,
+    "ratio_vs_orig": 33.85654588733139,
+    "delta_corr_vs_baseline": 0.06321912398561835,
+    "delta_mel_db_mae_vs_baseline": -4.88493013381958,
+    "delta_snr_db_vs_baseline": -0.1555992679149425
+  }
+}

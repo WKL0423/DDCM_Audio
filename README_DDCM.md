@@ -8,10 +8,10 @@ This prototype compresses audio by operating directly on the VAE latent using a 
 
 ## Quickstart
 
-1) Compress a WAV into a bitstream (default mode=coord yields better initial quality)
+1) 压缩 WAV 为比特流（仅支持 random 模式，已禁用 coord）
 
 ```
-python step2_ddcm_compress_audio.py .\AudioLDM2_Music_output.wav .\evaluation_results\audioldm2_music_ddcm --T 16 --mode coord
+python step2_ddcm_compress_audio.py .\AudioLDM2_Music_output.wav .\evaluation_results\audioldm2_music_ddcm --T 16 --K 256 --seed 1234
 ```
 
 2) Decompress to a WAV
@@ -22,24 +22,59 @@ python step3_ddcm_decompress_audio.py .\evaluation_results\audioldm2_music_ddcm 
 
 Notes:
 - The compressor internally loads `cvssp/audioldm2-music` (configurable via `--model`).
-- Hugging Face cache is resolved via `HUGGINGFACE_HUB_CACHE` or `HF_HOME/hub`, falling back to `F:\Kasai_Lab\hf_cache\huggingface\hub`.
+- Hugging Face cache is resolved via `HUGGINGFACE_HUB_CACHE` or `HF_HOME/hub`, falling back to `F:\\Kasai_Lab\\hf_cache\\huggingface\\hub`.
 - Determinism: codebook is fixed by `K` and `seed`. Keep them identical for compression and decompression.
 - Latent shape, T, K, seed, and model metadata are stored in the `.json` file.
+- 实现细节：Mel 提取采用 torchaudio（不依赖 librosa）；coord 模式已移除。
 
 ## Parameters
-- mode: coord | random
-  - coord: 直接在 VAE latent 的坐标基上做稀疏编码（选取幅值最大的 T 个位置），质量稳健，推荐默认
-  - random: 使用固定随机代码本做匹配追踪（需 K 与 seed），可能更稀疏但初版质量不稳定
-- K: 代码本大小（仅在 mode=random 时使用）
-- T: 选取的原子/坐标个数（越大越接近原始 latent）
-- seed: 代码本随机种子（仅在 mode=random 时使用；解码需一致）
+- mode: random（唯一支持）
+  - random: 使用固定随机码本做匹配追踪（需 K 与 seed）。
+- K: 码本大小（random 模式必需）
+- T: 选取的原子个数（越大越接近原始 latent）
+- seed: 码本随机种子（解码需一致）
+
+## Quality-First Evaluation Protocol (Frozen)
+
+This repo now uses a single quality-first protocol for DDCM progress tracking. The protocol keeps every result directly comparable with the latent codec baseline.
+
+- Primary objective: improve perceptual/objective quality first, then optimize rate.
+- Baseline for comparison: latent codec baseline pack (fixed seed/config).
+- Report both quality and size on every run (no quality-only claims).
+
+### Required Metrics (report all)
+
+- Waveform: `pearson_corr`, `snr_db`, `waveform_mse`
+- Spectral: `mel_db_mae`, `stft_mag_mse`
+- Route-level metrics (if available): `si_sdr_db`, `log_mel_mse`, `log_mel_corr`
+- Size: `bitstream_total_bytes`, `ratio_vs_orig`
+- Reproducibility: `model_id`, `T`, `K`, `seed`, `t_range`, and command line
+
+### Mandatory Artifact Checklist per Run
+
+Each run directory must include:
+
+- `manifest.json` (full configuration + references)
+- Reconstructed audio (`*_decomp.wav` or route-specific output wav)
+- Objective metrics json
+- Bitstream payload files
+- AB package (`ab_session`) and filled score csv (human or clearly labeled proxy)
+
+### Gate Rule
+
+A run is considered "quality-promising" only when:
+
+- flow-through is valid (`flow_corr >= 0.9999` and `flow_mse <= 1e-12`)
+- and quality is non-regressive vs the fixed latent baseline on at least one key metric (`pearson_corr` or `mel_db_mae`) with no severe size explosion.
+
+See `ddcm_experiments/EVAL_PROTOCOL_QUALITY_FIRST.md` for the operational checklist and reporting template.
 
 ## Limitations and Next Steps
-- This is a training-free baseline. It does not yet inject diffusion per-step variance or use the UNet to guide selection.
+- 当前为零训练基线：尚未在扩散每个 timestep 内进行离散噪声选择/注入，也未使用 UNet 进行前向一致性（方法三）引导。
 - Planned upgrades:
-  - Per-step diffusion-style variance injection and residual-guided index selection (closer to DDCM).
-  - Bitrate accounting and rate–distortion sweeps to choose (K, T) for a target bps.
-  - Optional matching pursuit variants (orthogonalization, block-wise atoms, multi-head codebooks).
+  - 每步扩散的方差注入与前向一致性选择（DDCM 方法三）。
+  - 码率统计与 (K, T) 的率失真扫描。
+  - 匹配追踪变体（正交化、分块原子、多头码本等）。
 
 ## Troubleshooting
 - If the model attempts to download, ensure your HF cache env vars point to a local path with the required models.

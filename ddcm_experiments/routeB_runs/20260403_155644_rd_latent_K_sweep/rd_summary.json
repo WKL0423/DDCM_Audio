@@ -1,0 +1,29 @@
+[
+  {
+    "K": 256,
+    "T": 64,
+    "total_payload_bytes": 1836,
+    "si_sdr_db": -47.95819186357213,
+    "log_mel_mse": 7.397330284118652,
+    "log_mel_corr": 0.2470741655305724,
+    "run_subdir": "F:\\Kasai_Lab\\Code\\AudioLDM_2_diffuser\\ddcm_experiments\\routeB_runs\\20260403_155644_rd_latent_K_sweep\\K256_T64"
+  },
+  {
+    "K": 512,
+    "T": 64,
+    "total_payload_bytes": 1853,
+    "si_sdr_db": -50.54142834999944,
+    "log_mel_mse": 7.381407737731934,
+    "log_mel_corr": 0.25084653771398346,
+    "run_subdir": "F:\\Kasai_Lab\\Code\\AudioLDM_2_diffuser\\ddcm_experiments\\routeB_runs\\20260403_155644_rd_latent_K_sweep\\K512_T64"
+  },
+  {
+    "K": 1024,
+    "T": 64,
+    "total_payload_bytes": 1868,
+    "si_sdr_db": -52.22071229142888,
+    "log_mel_mse": 7.317975997924805,
+    "log_mel_corr": 0.26735758532666154,
+    "run_subdir": "F:\\Kasai_Lab\\Code\\AudioLDM_2_diffuser\\ddcm_experiments\\routeB_runs\\20260403_155644_rd_latent_K_sweep\\K1024_T64"
+  }
+]

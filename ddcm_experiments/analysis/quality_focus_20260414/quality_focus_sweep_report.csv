@@ -1,0 +1,6 @@
+rank,source,name,corr,snr_db,mel_db_mae,bitstream_total_bytes,ratio_vs_orig,delta_corr_vs_baseline,delta_mel_db_mae_vs_baseline,delta_snr_db_vs_baseline
+1,quality_push_large_codebook,runs/quality_push_large_codebook/T=100_in900-80_K=128_P=2_CB=4_model=audioldm2-music_audio,0.071008936,-1.387404138,5.679022312,18905,33.85654588733139,0.063219124,-4.884930134,-0.155599268
+2,quality_push_large_codebook,runs/quality_push_large_codebook/T=100_in900-80_K=1000_P=2_CB=4_model=audioldm2-music_audio,0.047076005,-1.637074991,5.265000343,19034,33.62708836818325,0.039286194,-5.298952103,-0.405270121
+3,multiobjective_pareto_push,eta_tail_200_0p9_80,0.025721320,-1.168553009,6.648435911,-1,-1.0,0.017931508,-3.915516535,0.063251861
+4,generalization_push,new_best_schedule_eta_tail,0.025721320,-1.168553009,6.648435911,-1,-1.0,0.017931508,-3.915516535,0.063251861
+5,multiobjective_pareto_push,eta_tail_200_0p92_80,0.025499419,-1.168036269,6.646798770,-1,-1.0,0.017709608,-3.917153676,0.063768601

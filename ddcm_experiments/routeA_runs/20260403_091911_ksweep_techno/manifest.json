@@ -1,0 +1,15 @@
+{
+  "prompt": "techno music with driving bassline and synth pads",
+  "negative_prompt": "low quality",
+  "model": "cvssp/audioldm2-music",
+  "steps": 20,
+  "guidance": 3.5,
+  "audio_length": 10.24,
+  "eta": 1.0,
+  "K_step5_replay": 512,
+  "Ks_step6_sweep": "64,128,256,512,1024,2048",
+  "codebook_seed": 1234,
+  "latent_seed": 0,
+  "ddcm_local_files_only": "1",
+  "skip_ab": false
+}

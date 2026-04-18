@@ -1,0 +1,41 @@
+2. Route A baseline（稳定配置）
+我基于你这次已经跑通的一组参数，建议把下面作为 Route A 标准 baseline（你可以直接照抄到自己的笔记里）：
+
+模型与设备
+
+模型：cvssp/audioldm2-music
+采样率：16 kHz
+设备：cuda:0（RTX 3070）
+采样 / scheduler 配置（与当前 Route A 一致）
+
+Scheduler：DDIM（AudioLDM2 默认）
+num_inference_steps: 20
+guidance_scale: 3.5
+audio_length_seconds: 10.24
+eta: 1.0（启用随机性，有 variance_noise）
+Prompt 约定（techno 线）
+
+主 prompt：
+"techno music with driving bassline and synth pads"
+Negative prompt：
+"low quality"
+可以额外备用 1–2 个变体（不强制）：
+"dark techno with punchy kick and minimal synths"
+"melodic techno with atmospheric pads and deep bass"
+种子与 DDCM 配置
+
+latent_seed: 0（控制主轨迹）
+codebook_seed: 1234（控制 codebook 重现）
+baseline（无 DDCM）：常规 DDIM，记录：
+baseline 生成的 wav；
+质量指标（如果你愿意，可以用现有的 step7_compare_audio_quality.py 对 baseline 自身做 sanity check，如重复采样间的差异）。
+这套配置的意义是：任何后续的 K-sweep、步数 sweep，都围绕它展开，只改 K 或步数，其它不动。
+
+还可以考虑的两个方向（如果以后想加）：
+
+逐步 log-mel 误差轨迹：
+记录 baseline 每一步 (x_t) 与 DDCM 重放的 (x_t') 的 log-mel 差异；
+看随 (t)（步数）增长，误差是快速饱和还是平滑积累。
+节奏相关度/能量包络相关度：
+对波形做短时能量包络（如每 10ms 窗口能量），算 baseline vs DDCM 的相关系数；
+重点看 100–500 Hz 频段的 envelope（鼓、bass 的地方）是不是仍然高度同步。

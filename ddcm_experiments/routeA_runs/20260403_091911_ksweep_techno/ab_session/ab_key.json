@@ -1,0 +1,9 @@
+{
+  "sample_A_file": "sample_A.wav",
+  "sample_B_file": "sample_B.wav",
+  "sample_A_role": "hypothesis",
+  "sample_B_role": "reference",
+  "sample_A_is_reference": false,
+  "reference_source_path": "F:\\Kasai_Lab\\Code\\AudioLDM_2_diffuser\\ddcm_experiments\\routeA_runs\\20260403_091911_ksweep_techno\\step5\\reference_full_noise.wav",
+  "hypothesis_source_path": "F:\\Kasai_Lab\\Code\\AudioLDM_2_diffuser\\ddcm_experiments\\routeA_runs\\20260403_091911_ksweep_techno\\step5\\matched_codebook_noise.wav"
+}

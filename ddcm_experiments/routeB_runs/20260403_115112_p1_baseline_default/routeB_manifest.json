@@ -1,0 +1,21 @@
+{
+  "route": "B_phase1_latent_codec_only",
+  "input_wav": "C:\\Users\\TheOne\\.cursor\\worktrees\\AudioLDM_2_diffuser\\gav\\samples\\synthetic_techno_clip.wav",
+  "model": "cvssp/audioldm2-music",
+  "codec": {
+    "K": 512,
+    "T": 64,
+    "seed": 1234,
+    "mode": "omp"
+  },
+  "bitstream_files": {
+    "json_bytes": 293,
+    "npz_bytes": 1561,
+    "total_bytes": 1854
+  },
+  "outputs": {
+    "reconstructed_wav": "F:\\Kasai_Lab\\Code\\AudioLDM_2_diffuser\\ddcm_experiments\\routeB_runs\\20260403_115112_p1_baseline_default\\reconstructed.wav",
+    "quality_metrics": "F:\\Kasai_Lab\\Code\\AudioLDM_2_diffuser\\ddcm_experiments\\routeB_runs\\20260403_115112_p1_baseline_default\\quality_metrics.json"
+  },
+  "phase2_inversion": "see ddcm/routeB_inversion.py (stubs / checklist)"
+}
