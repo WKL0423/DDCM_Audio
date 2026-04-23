@@ -36,6 +36,13 @@ Thumbs.db
 
 # Generated analysis & artifacts
 step_1_training_matched_vae_reconstruction_fixed/
+# Experiment outputs / reports
+runs/
+archive/
+backup/
+temp_pkgs/
+ddcm_experiments/analysis/
+ddcm_experiments/routeA_runs/
 # Keep plots if desired; comment out next line if you want to track images
 # *.png
 

@@ -4,7 +4,7 @@ import json
 import subprocess
 from pathlib import Path
 
-PY = r"E:/ProgramData/Anaconda3/envs/audioldm_env/python.exe"
+from ddcm_tool_env import PY
 
 
 def run_cmd(args: list[str]) -> str:
